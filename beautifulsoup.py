@@ -19,16 +19,16 @@ pd.set_option('display.max_columns', 5)
 pd.set_option('display.width',800)
 
 
-driver = webdriver.Chrome('C:/Users/jerri/Downloads/chromedriver87.exe')
+# driver = webdriver.Chrome('C:/Users/jerri/Downloads/chromedriver87.exe')
 
 
 # %%% 
 
 
 #Creating the list of links.
-links_to_scrape = ['https://www.imdb.com/list/ls056549735/']
-one_link = links_to_scrape[0]
-driver.get(one_link)
+# links_to_scrape = ['https://www.imdb.com/list/ls056549735/']
+# one_link = links_to_scrape[0]
+# driver.get(one_link)
 link = ['https://www.imdb.com/list/ls056549735/',
             'https://www.imdb.com/list/ls056549735/?sort=list_order,asc&st_dt=&mode=detail&page=2',
             'https://www.imdb.com/list/ls056549735/?sort=list_order,asc&st_dt=&mode=detail&page=3',
@@ -52,19 +52,20 @@ for i in link:
 
     soup                         = BeautifulSoup(reviews,'lxml')
             
-    movie_list = soup.find_all('div',{'class':'lister-item mode-detail'})
-    r                 = 0
+    movie_list = soup.find_all('div',{'class':'lister-item-content'})
+    # r                 = 0
+    
     for r in range(len(movie_list)):
         one_review                   = {}
         one_review['scrapping_date'] = datetime.datetime.now()
-        one_review['url']            = driver.current_url
+        # one_review['url']            = driver.current_url
     
     # get the order
-        movie_order = movie_list[r].find_all('span')
-        if movie_order == []:
+        movie_order = movie_list[r].find('span', {'class':'lister-item-index unbold text-primary'})
+        if movie_order is None:
             one_review_order = ''
         else:
-            one_review_order = movie_order[0].text
+            one_review_order = movie_order.text
         one_review['movie_order']= one_review_order
         
     # get the movie name
@@ -72,7 +73,7 @@ for i in link:
         if movie_name == []:
             one_review_name = ''
         else:
-            one_review_name = movie_name[1].text
+            one_review_name = movie_name[0].text
         one_review['movie_name']= one_review_name
         
      
@@ -85,19 +86,19 @@ for i in link:
         one_review['movie_year']= one_review_year
         
       # get the classifier 
-        movie_class = movie_list[r].find_all('span')
-        if movie_class == []:
+        movie_class = movie_list[r].find('span', {'class':'certificate'})
+        if movie_class is None:
             one_review_class = ''
         else:
-            one_review_class = movie_class[2].text
+            one_review_class = movie_class.text
         one_review['movie_classifier']= one_review_class     
         
     # get the duration 
-        movie_dur = movie_list[r].find_all('span')
-        if movie_dur == []:
+        movie_dur = movie_list[r].find('span', {'class':'runtime'})
+        if movie_dur is None:
             one_review_dur = ''
         else:
-            one_review_dur = movie_dur[4].text
+            one_review_dur = movie_dur.text
         one_review['movie_duration']= one_review_dur
         
      # get the review 
@@ -109,35 +110,43 @@ for i in link:
         one_review['movie_review']= one_review_review
         
     # get genre   
-        movie_genre = movie_list[r].find_all('span')
+        movie_genre = movie_list[r].find('span', {'class':'genre'})
         try:
-            one_review_genre = movie_genre[6].text 
+            one_review_genre = movie_genre.text
         except IndexError:
             one_review_genre = ''
+        except AttributeError:
+            one_review_genre = ''    
         one_review['movie_genre']= one_review_genre
     
      # get the star
-        movie_star = movie_list[r].find_all('span')
+        movie_star = movie_list[r].find('span', {'class':'ipl-rating-star__rating'})
         try:
-            one_review_stars = movie_star[8].text 
+            one_review_stars = movie_star.text
         except IndexError:
             one_review_stars = ''
+        except AttributeError:
+            one_review_genre = ''
         one_review['movie_star']= one_review_stars    
   
     # get the director
         movie_director = movie_list[r].find_all('a')
         try:
-            one_review_director = movie_director[13].text 
+            one_review_director = movie_director[12].text 
         except IndexError:
             one_review_director = ''
+        except AttributeError:
+            one_review_genre = ''
         one_review['movie_director']= one_review_director         
   
     # get the votes
-        movie_votes = movie_list[r].find_all('span')
+        movie_votes = movie_list[r].find('span', {'name':'nv'})
         try:
-            one_review_votes = movie_votes[59].text 
+            one_review_votes = movie_votes.text
         except IndexError:
             one_review_votes = ''
+        except AttributeError:
+            one_review_genre = ''
         one_review['movie_votes']= one_review_votes 
 
     # get the gross
@@ -146,6 +155,8 @@ for i in link:
             one_review_gross = movie_gross[62].text 
         except IndexError:
             one_review_gross = ''
+        except AttributeError:
+            one_review_genre = ''
         one_review['movie_gross']= one_review_gross
         
         
