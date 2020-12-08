@@ -25,17 +25,21 @@ pd.set_option('display.width',       800)
 pd.set_option('display.max_colwidth', 20)
 
 np.random.seed(1)
-os.chdir('C:\\Users\\jerri\\Downloads')
+os.chdir('D:\\school\\grad\\2020Fall\\Marketing\\project')
 
 #%% Data Cancer read file into python
-dta_cancer = pd.read_csv('data_cancer_benigno_maligno.csv').reset_index()
-dta_cancer = dta_cancer.replace({'B': 0,'M':1})
+df = pd.read_csv('movies.csv')
+df['movie_year'] = df.movie_year.str.extract('(.)([0-9][0-9][0-9][0-9])(.)')[[1]].astype(int)
+df['movie_duration'] = df.movie_duration.str.extract('([0-9]+)( \w\w\w)')[[0]].astype(float)
+df['movie_star'] = df.movie_star.astype(float)
+df['movie_votes'] = df.movie_votes.str.replace(',', '').astype(int)
+df['movie_gross'] = df.movie_gross.str.extract('(.)([0-9]+\.[0-9]+)(M)')[[1]].astype(float)
+df.dtypes
 
 #%% Standardization
-dta_cancer = dta_cancer.drop('id', axis=1)
-scaler = preprocessing.StandardScaler().fit(dta_cancer.iloc[:,1:])
-cancer_X_scaled = scaler.transform(dta_cancer.iloc[:,1:])
-cancer_Y = dta_cancer['diagnosis']
+scaler = preprocessing.StandardScaler().fit(dta_1.iloc[:,[0,1,2,4]])
+cancer_X_scaled = scaler.transform(dta_1.iloc[:,[0,12,4]])
+cancer_Y = dta_1['movie_star']
 
 #%% Spliting data
 x_train_vali, x_test, y_train_vali, y_test = train_test_split(cancer_X_scaled, 
